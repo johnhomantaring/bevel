@@ -1,0 +1,48 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: anchorpeer-allchannel-trader
+  namespace: trader-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: anchorpeer-allchannel-trader
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/anchorpeer
+  values:
+    metadata:
+      namespace: trader-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.trader-net:7051
+      localmspid: traderMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://afa8761a6902d4eed83106ebd15d7aec-1934446345.ap-southeast-1.elb.amazonaws.com:8200
+      authpath: devtrader-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/trader-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/trader-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: allchannel      
+    orderer:
+      address: orderer1.supplychain-net:7050
+    anchorstx: |-
+      CrQCChgKFggCGgYI9YyDlwYiCmFsbGNoYW5uZWwSlwIKlAIKCmFsbGNoYW5uZWwSYhJgCgtBcHBs
+      aWNhdGlvbhJRCAESTQoJdHJhZGVyTVNQEkAaBwoDTVNQEgAiCgoGQWRtaW5zEgAiDwoLRW5kb3Jz
+      ZW1lbnQSACILCgdSZWFkZXJzEgAiCwoHV3JpdGVycxIAGqEBEp4BCgtBcHBsaWNhdGlvbhKOAQgB
+      EokBCgl0cmFkZXJNU1ASfAgBGjAKC0FuY2hvclBlZXJzEiESFwoVChBwZWVyMC50cmFkZXItbmV0
+      EIs3GgZBZG1pbnMaBwoDTVNQEgAiCgoGQWRtaW5zEgAiDwoLRW5kb3JzZW1lbnQSACILCgdSZWFk
+      ZXJzEgAiCwoHV3JpdGVycxIAKgZBZG1pbnM=
+
