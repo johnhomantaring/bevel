@@ -1,0 +1,33 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: retailer-vaultkubenertes-job
+  namespace: retailer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: retailer-vaultkubenertes-job
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/vault_kubernetes
+  values:
+    metadata:
+      name: retailer
+      component_type: peer
+      namespace: retailer-net    
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    vault:
+      reviewer_service: vault-reviewer
+      role: vault-role
+      address: http://afa8761a6902d4eed83106ebd15d7aec-1934446345.ap-southeast-1.elb.amazonaws.com:8200
+      authpath: devretailer-net-auth
+      policy: vault-crypto-peer-retailer-net-ro
+      secret_path: secretsv2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    k8s:
+      kubernetes_url: https://2521FA258926CD8B4D5002CB15C2EF48.yl4.ap-southeast-1.eks.amazonaws.com
