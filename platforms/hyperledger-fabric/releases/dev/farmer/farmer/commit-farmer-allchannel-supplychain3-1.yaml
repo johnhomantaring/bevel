@@ -1,0 +1,53 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: commit-farmer-allchannel-supplychain3-1
+  namespace: farmer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: commit-farmer-allchannel-supplychain3-1
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/commit_chaincode
+  values:
+    metadata:
+      namespace: farmer-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    peer:
+      name: peer0
+      address: peer0.farmer-net:7051
+      localmspid: farmerMSP
+      loglevel: debug
+      tlsstatus: true
+    vault:
+      role: vault-role
+      address: http://afa8761a6902d4eed83106ebd15d7aec-1934446345.ap-southeast-1.elb.amazonaws.com:8200
+      authpath: devfarmer-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/farmer-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/farmer-net/orderer
+      secretpath: secretsv2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    orderer:
+      address: orderer1.supplychain-net:7050
+    chaincode:
+      builder: hyperledger/fabric-ccenv:2.2.2
+      name: supplychain
+      version: 3
+      sequence: 1
+      commitarguments: '\"init\",\"\"'
+      endorsementpolicies:  ''
+    channel:
+      name: allchannel
+    endorsers:
+      creator: farmer-net
+      name:  farmer  trader 
+      corepeeraddress:  peer0.farmer-net:7051  peer0.trader-net:7051 
+      nameslist: 
+        - name: farmer
+        - name: trader
