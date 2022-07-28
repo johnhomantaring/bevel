@@ -1,0 +1,33 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: producer-vaultkubenertes-job
+  namespace: producer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: producer-vaultkubenertes-job
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/vault_kubernetes
+  values:
+    metadata:
+      name: producer
+      component_type: peer
+      namespace: producer-net    
+      images:
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    vault:
+      reviewer_service: vault-reviewer
+      role: vault-role
+      address: http://afa8761a6902d4eed83106ebd15d7aec-1934446345.ap-southeast-1.elb.amazonaws.com:8200
+      authpath: devproducer-net-auth
+      policy: vault-crypto-peer-producer-net-ro
+      secret_path: secretsv2
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    k8s:
+      kubernetes_url: https://2521FA258926CD8B4D5002CB15C2EF48.yl4.ap-southeast-1.eks.amazonaws.com
