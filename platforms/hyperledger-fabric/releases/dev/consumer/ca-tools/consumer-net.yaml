@@ -1,0 +1,80 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: consumer-net-ca-tools
+  namespace: consumer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: consumer-net-ca-tools
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/catools
+  values:
+    metadata:
+      namespace: consumer-net
+      name: ca-tools
+      component_type: peer
+      org_name: consumer
+      proxy: none
+    annotations:  
+      service:
+        - example1: example2
+      pvc:
+      deployment:
+    replicaCount: 1
+
+    image:
+      repository: hyperledger/fabric-ca-tools
+      tag: 1.2.1
+      pullPolicy: IfNotPresent
+      alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+      
+    storage:
+      storageclassname: consumersc
+      storagesize: 512Mi
+    
+    vault:
+      role: vault-role
+      address: http://afa8761a6902d4eed83106ebd15d7aec-1934446345.ap-southeast-1.elb.amazonaws.com:8200
+      authpath: devconsumer-net-auth
+      secretmsp: secretsv2/data/crypto/peerOrganizations/consumer-net/users/admin/msp
+      secrettls: secretsv2/data/crypto/peerOrganizations/consumer-net/users/admin/tls
+      secretorderer: secretsv2/data/crypto/peerOrganizations/consumer-net/orderers
+      secretpeer: secretsv2/data/crypto/peerOrganizations/consumer-net/peers
+      secretpeerorderertls: secretsv2/data/crypto/peerOrganizations/consumer-net/orderer/tls
+      secretambassador: secretsv2/data/crypto/peerOrganizations/consumer-net/ambassador
+      secretcert: secretsv2/data/crypto/peerOrganizations/consumer-net/ca?ca.consumer-net-cert.pem
+      secretkey: secretsv2/data/crypto/peerOrganizations/consumer-net/ca?consumer-net-CA.key
+      secretcouchdb: secretsv2/data/credentials/consumer-net/couchdb/consumer
+      secretconfigfile: secretsv2/data/crypto/peerOrganizations/consumer-net/msp/config
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+    
+    healthcheck: 
+      retries: 10
+      sleepTimeAfterError: 2
+
+    
+    org_data:
+      external_url_suffix: develop.local.com
+      component_subject: O=Consumer,OU=Consumer,L=47.38/8.54/North Carolina,C=US
+      cert_subject: O=Consumer/OU=Consumer/L=47.38,8.54,North Carolina/C=US
+      component_country: US
+      component_state: North Carolina
+      component_location: North Carolina
+      ca_url: ca.consumer-net:7054
+
+    orderers:
+      name: orderer1-
+    orderers_info:
+      - name: orderer1
+        path: "certs/orderer1-ca.crt"
+
+    peers:
+      name: peer0,-      
+    peer_count: "1"
+
+    checks:
+      refresh_cert_value: False
