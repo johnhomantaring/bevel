@@ -32,7 +32,6 @@
 **/token
 **/target/*
 **/*.log
-**/aws
 # Ignore node_modules
 **/node_modules
 **/*.srl
