@@ -1,0 +1,48 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: anchorpeer-allchannel-retailer
+  namespace: retailer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: anchorpeer-allchannel-retailer
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/anchorpeer
+  values:
+    metadata:
+      namespace: retailer-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.retailer-net:7051
+      localmspid: retailerMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://afa8761a6902d4eed83106ebd15d7aec-1934446345.ap-southeast-1.elb.amazonaws.com:8200
+      authpath: devretailer-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/retailer-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/retailer-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: allchannel      
+    orderer:
+      address: orderer1.supplychain-net:7050
+    anchorstx: |-
+      CroCChgKFggCGgYI/uyNlwYiCmFsbGNoYW5uZWwSnQIKmgIKCmFsbGNoYW5uZWwSZBJiCgtBcHBs
+      aWNhdGlvbhJTCAESTwoLcmV0YWlsZXJNU1ASQBoHCgNNU1ASACILCgdXcml0ZXJzEgAiCgoGQWRt
+      aW5zEgAiDwoLRW5kb3JzZW1lbnQSACILCgdSZWFkZXJzEgAapQESogEKC0FwcGxpY2F0aW9uEpIB
+      CAESjQEKC3JldGFpbGVyTVNQEn4IARoyCgtBbmNob3JQZWVycxIjEhkKFwoScGVlcjAucmV0YWls
+      ZXItbmV0EIs3GgZBZG1pbnMaBwoDTVNQEgAiCwoHUmVhZGVycxIAIgsKB1dyaXRlcnMSACIKCgZB
+      ZG1pbnMSACIPCgtFbmRvcnNlbWVudBIAKgZBZG1pbnM=
+
