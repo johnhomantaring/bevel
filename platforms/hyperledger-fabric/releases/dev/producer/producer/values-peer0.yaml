@@ -1,0 +1,78 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: producer-peer0
+  namespace: producer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: producer-peer0
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/peernode    
+  values:
+    metadata:
+      namespace: producer-net
+      images:
+        couchdb: couchdb:3.1
+        peer: hyperledger/fabric-peer:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    annotations:  
+      service:
+        - example1: example2
+      pvc:
+      deployment:
+        
+    peer:
+      name: peer0
+      gossippeeraddress: peer0.producer-net:7051
+      gossipexternalendpoint: peer0.producer-net:7051
+      localmspid: producerMSP
+      loglevel: info
+      tlsstatus: true
+      builder: hyperledger/fabric-ccenv:2.2.2
+      couchdb:
+        username: producer-user
+
+    storage:
+      peer:
+        storageclassname: producersc
+        storagesize: 512Mi
+      couchdb:
+        storageclassname: producersc
+        storagesize: 1Gi
+
+    vault:
+      role: vault-role
+      address: http://afa8761a6902d4eed83106ebd15d7aec-1934446345.ap-southeast-1.elb.amazonaws.com:8200
+      authpath: devproducer-net-auth
+      secretprefix: secretsv2/data/crypto/peerOrganizations/producer-net/peers/peer0.producer-net
+      secretambassador: secretsv2/data/crypto/peerOrganizations/producer-net/ambassador
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      secretcouchdbpass: secretsv2/data/credentials/producer-net/couchdb/producer?user
+
+    service:
+      servicetype: ClusterIP
+      ports:
+        grpc:
+          clusteripport: 7051
+        events:
+          clusteripport: 7053
+        couchdb:
+          clusteripport: 5984
+          
+    proxy:
+      provider: "none"
+      external_url_suffix: develop.local.com
+
+    config:
+      pod:
+        resources:
+          limits:
+            memory: 512M
+            cpu: 1
+          requests:
+            memory: 512M
+            cpu: 0.5
