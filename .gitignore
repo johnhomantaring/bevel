@@ -32,9 +32,12 @@
 **/token
 **/target/*
 **/*.log
+**/aws/
 # Ignore node_modules
 **/node_modules
 **/*.srl
 **/.vscode/
 # custom config templates
 *_custom.tpl
+token.json
+kubectl
