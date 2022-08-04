@@ -1,0 +1,48 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: anchorpeer-allchannel-producer
+  namespace: producer-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: anchorpeer-allchannel-producer
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/anchorpeer
+  values:
+    metadata:
+      namespace: producer-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+
+    peer:
+      name: peer0
+      address: peer0.producer-net:7051
+      localmspid: producerMSP
+      loglevel: debug
+      tlsstatus: true
+
+    vault:
+      role: vault-role
+      address: http://a50fb759de7a74c7380c5e1e627f2212-248118612.ap-southeast-1.elb.amazonaws.com:8201
+      authpath: devproducer-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/producer-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/producer-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+
+    channel:
+      name: allchannel      
+    orderer:
+      address: orderer1.supplychain-net:7050
+    anchorstx: |-
+      CroCChgKFggCGgYIy5+vlwYiCmFsbGNoYW5uZWwSnQIKmgIKCmFsbGNoYW5uZWwSZBJiCgtBcHBs
+      aWNhdGlvbhJTCAESTwoLcHJvZHVjZXJNU1ASQBoHCgNNU1ASACILCgdXcml0ZXJzEgAiCgoGQWRt
+      aW5zEgAiDwoLRW5kb3JzZW1lbnQSACILCgdSZWFkZXJzEgAapQESogEKC0FwcGxpY2F0aW9uEpIB
+      CAESjQEKC3Byb2R1Y2VyTVNQEn4IARoyCgtBbmNob3JQZWVycxIjEhkKFwoScGVlcjAucHJvZHVj
+      ZXItbmV0EIs3GgZBZG1pbnMaBwoDTVNQEgAiCgoGQWRtaW5zEgAiDwoLRW5kb3JzZW1lbnQSACIL
+      CgdSZWFkZXJzEgAiCwoHV3JpdGVycxIAKgZBZG1pbnM=
+
