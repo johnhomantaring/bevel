@@ -1,0 +1,38 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: peer0-wholesaler-cli
+  namespace: wholesaler-net
+  annotations:
+    fluxcd.io/automated: "false"
+spec:
+  releaseName: peer0-wholesaler-cli
+  chart:
+    git: git@github.com:johnhomantaring/bevel.git
+    ref: local
+    path: platforms/hyperledger-fabric/charts/fabric_cli    
+  values:
+    metadata:
+      namespace: wholesaler-net
+      images:
+        fabrictools: hyperledger/fabric-tools:2.2.2
+        alpineutils: index.docker.io/hyperledgerlabs/alpine-utils:1.0
+    storage:
+      class: wholesalersc
+      size: 256Mi
+    vault:
+      role: vault-role
+      address: http://a50fb759de7a74c7380c5e1e627f2212-248118612.ap-southeast-1.elb.amazonaws.com:8201
+      authpath: devwholesaler-net-auth
+      adminsecretprefix: secretsv2/data/crypto/peerOrganizations/wholesaler-net/users/admin
+      orderersecretprefix: secretsv2/data/crypto/peerOrganizations/wholesaler-net/orderer
+      serviceaccountname: vault-auth
+      imagesecretname: regcred
+      tls: false
+    peer:
+      name: peer0
+      localmspid: wholesalerMSP
+      tlsstatus: true
+      address: peer0.wholesaler-net:7051
+    orderer:
+      address: orderer1.supplychain-net:7050
